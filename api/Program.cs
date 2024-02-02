@@ -1,3 +1,7 @@
+using api.Data;
+using api.Repositories.Implementations;
+using api.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +12,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddScoped<IStockRepository, StockRepository>();
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -16,6 +22,11 @@ builder.Services.AddSwaggerGen(options =>
         Title = "Stock Market API",
         Description = "An ASP.NET Core Web API for managing Stock Market Actions"
     });
+});
+
+builder.Services.AddDbContext<AppDbContext>(op =>
+{
+    op.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 var app = builder.Build();
