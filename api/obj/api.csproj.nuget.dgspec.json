@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\StockMarket\\api\\api.csproj": {}
+    "E:\\FullStack\\StockMarket\\api\\api.csproj": {}
   },
   "projects": {
-    "E:\\StockMarket\\api\\api.csproj": {
+    "E:\\FullStack\\StockMarket\\api\\api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\StockMarket\\api\\api.csproj",
+        "projectUniqueName": "E:\\FullStack\\StockMarket\\api\\api.csproj",
         "projectName": "api",
-        "projectPath": "E:\\StockMarket\\api\\api.csproj",
+        "projectPath": "E:\\FullStack\\StockMarket\\api\\api.csproj",
         "packagesPath": "C:\\Users\\tatot\\.nuget\\packages\\",
-        "outputPath": "E:\\StockMarket\\api\\obj\\",
+        "outputPath": "E:\\FullStack\\StockMarket\\api\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\tatot\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -39,6 +39,12 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.5.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
