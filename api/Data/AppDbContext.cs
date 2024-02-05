@@ -17,6 +17,10 @@ namespace api.Data
             );
 
             // Seed data for Comments table
+            modelBuilder.Entity<Comment>().HasData(
+                new Comment { Id = 1, Title = "First Comment Title", Content = "Test Content for first comment", CreationTime = DateTime.Now, StockId = 1},
+                new Comment { Id = 2, Title = "Second Comment Title", Content = "Test Content for second comment", CreationTime = DateTime.Now, StockId = 2 }
+            );
         }
     }
 }
