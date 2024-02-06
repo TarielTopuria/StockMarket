@@ -9,6 +9,7 @@ namespace api.Mappers
         public CommentMappers()
         {
             CreateMap<Comment, CommentResponseDTO>();
+            CreateMap<CommentRequestDTO, Comment>();
         }
     }
 }

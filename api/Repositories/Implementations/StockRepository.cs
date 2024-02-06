@@ -88,5 +88,10 @@ namespace api.Repositories.Implementations
 
             return changes > 0;
         }
+
+        public async Task<bool> StockExists(int id)
+        {
+            return await _context.Stocks.AnyAsync(x => x.Id == id);
+        }
     }
 }

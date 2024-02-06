@@ -1,42 +1,95 @@
-﻿using api.Data;
+﻿using System.Data.Common;
+using api.Data;
 using api.DTOs.Comment;
+using api.Handlers.CustomExceptions;
+using api.Models;
 using api.Repositories.Interfaces;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Repositories.Implementations
 {
-    public class CommentRepository (AppDbContext context, IMapper mapper) : ICommentRepository
+    public class CommentRepository(AppDbContext context, IMapper mapper) : ICommentRepository
     {
-        private readonly AppDbContext _context = context;
-        private readonly IMapper _mapper = mapper;
+        private readonly AppDbContext _context = context ?? throw new ArgumentNullException(nameof(context));
+        private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
         public async Task<List<CommentResponseDTO>?> GetCommentsAsync()
         {
-            var comments = await _context.Comments.ToListAsync();
-            
-            if(comments is null)
+            try
             {
-                return null;
+                var comments = await _context.Comments.ToListAsync();
+                return _mapper.Map<List<CommentResponseDTO>>(comments);
             }
-
-            List<CommentResponseDTO> mappedComments = _mapper.Map<List<CommentResponseDTO>>(comments);
-
-            return mappedComments;
+            catch (DbException ex)
+            {
+                throw new DatabaseException($"Database operation failed: {ex}");
+            }
         }
 
         public async Task<CommentResponseDTO?> GetCommentByIdAsync(int id)
         {
-            var comment = await _context.Comments.SingleOrDefaultAsync(c => c.Id == id);
-            
-            if(comment == null)
+            try
             {
-                return null;
+                var comment = await _context.Comments.FindAsync(id);
+                return comment != null ? _mapper.Map<CommentResponseDTO>(comment) : null;
             }
+            catch (DbException ex)
+            {
+                throw new DatabaseException($"Database operation failed: {ex}");
+            }
+        }
 
-            var result = _mapper.Map<CommentResponseDTO>(comment);
+        public async Task<Comment?> CreateCommentAsync(int stockId, CommentRequestDTO commentDTO)
+        {
+            try
+            {
+                var comment = _mapper.Map<Comment>(commentDTO);
+                comment.StockId = stockId;
 
-            return result;
+                await _context.Comments.AddAsync(comment);
+                var result = await _context.SaveChangesAsync();
+
+                return result > 0 ? _mapper.Map<Comment>(comment) : null;
+            }
+            catch (DbException ex)
+            {
+                throw new DatabaseException($"Database operation failed: {ex}");
+            }
+        }
+
+        public async Task<bool> DeleteCommentAsync(int id)
+        {
+            try
+            {
+                var commentModel = await _context.Comments.FirstOrDefaultAsync(x => x.Id == id);
+
+                if(commentModel is null)
+                {
+                    return false;
+                }
+
+                _context.Comments.Remove(commentModel);
+                var result = await _context.SaveChangesAsync();
+
+                return result > 0;
+            }
+            catch (DbException ex)
+            {
+                throw new DatabaseException($"Database operation failed: {ex}");
+            }
+        }
+
+        public async Task<bool> CommentExists(int id)
+        {
+            try
+            {
+                return await _context.Comments.AnyAsync(x => x.Id == id);
+            }
+            catch (DbException ex)
+            {
+                throw new DatabaseException($"Database operation failed: {ex}");
+            }
         }
     }
 }

@@ -15,8 +15,7 @@ const Hero = (props: Props) => {
             Financial data with no news.
           </h1>
           <p className="text-2xl text-center text-gray-400 lg:max-w-md lg:text-left">
-            Search relevant financial documents without fear mongering and fake
-            news.
+            Search relevant financial documents without fear mongering and fake news.
           </p>
           <div className="mx-auto lg:mx-0">
             <Link
