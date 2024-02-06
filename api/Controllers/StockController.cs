@@ -1,6 +1,7 @@
 ﻿using api.DTOs.Stock;
 using api.Models;
 using api.Repositories.Interfaces;
+using api.Validators.Stock;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography.Xml;
@@ -9,15 +10,10 @@ namespace api.Controllers
 {
     [Route("api/[Controller]")]
     [ApiController]
-    public class StockController : Controller
+    public class StockController(IStockRepository stockRepository, IMapper mapper) : Controller
     {
-        private readonly IStockRepository _stockRepository;
-        private readonly IMapper _mapper;
-        public StockController(IStockRepository stockRepository, IMapper mapper)
-        {
-            _stockRepository = stockRepository;
-            _mapper = mapper;
-        }
+        private readonly IStockRepository _stockRepository = stockRepository;
+        private readonly IMapper _mapper = mapper;
 
         [HttpGet]
         [Route("GetStocks")]
@@ -69,6 +65,12 @@ namespace api.Controllers
         {
             try
             {
+                var validator = new StockRequestValidator();
+                var validationResult = validator.Validate(stock);
+
+                if(!validationResult.IsValid)
+                    return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
+
                 var result = await _stockRepository.CreateStockAsync(stock);
                 
                 if (result == null)
@@ -95,6 +97,13 @@ namespace api.Controllers
         {
             try
             {
+
+                var validator = new UpdateStockValidator();
+                var validationResult = validator.Validate(request);
+
+                if (!validationResult.IsValid)
+                    return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
+
                 var result = await _stockRepository.UpdateStockAsync(id, request);
 
                 if (result is null)

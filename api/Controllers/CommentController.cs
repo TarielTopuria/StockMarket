@@ -1,6 +1,9 @@
 ﻿using api.DTOs.Comment;
 using api.Handlers.CustomExceptions;
 using api.Repositories.Interfaces;
+using api.Validators.Comment;
+using api.Validators.Stock;
+using Azure.Core;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -41,7 +44,7 @@ namespace api.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<CommentResponseDTO>> GetCommentById(int id)
         {
             try
@@ -69,11 +72,17 @@ namespace api.Controllers
             }
         }
 
-        [HttpPost("{stockId}/AddComment")]
+        [HttpPost("{stockId:int}/AddComment")]
         public async Task<ActionResult<CommentResponseDTO>> AddComment([FromRoute] int stockId, CommentRequestDTO comment)
         {
             try
             {
+                var validator = new CommentRequestValidator();
+                var validationResult = validator.Validate(comment);
+
+                if (!validationResult.IsValid)
+                    return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
+
                 if (!await _stockRepository.StockExists(stockId))
                 {
                     return NotFound("Stock not found");
@@ -103,7 +112,7 @@ namespace api.Controllers
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> DeleteComment([FromRoute] int id)
         {
             try

@@ -1,6 +1,8 @@
 using api.Data;
 using api.Repositories.Implementations;
 using api.Repositories.Interfaces;
+using api.Validators;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -37,6 +39,8 @@ builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddValidatorsFromAssemblyContaining<IdValidator>();
+
 
 var app = builder.Build();
 

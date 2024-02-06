@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace api.DTOs.Comment
+﻿namespace api.DTOs.Comment
 {
     public class CommentRequestDTO
     {
