@@ -1,5 +1,6 @@
 ﻿using api.DTOs.Comment;
 using api.Handlers.CustomExceptions;
+using api.Models;
 using api.Repositories.Interfaces;
 using api.Validators.Comment;
 using api.Validators.Stock;
@@ -132,6 +133,41 @@ namespace api.Controllers
                 }
 
                 return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (DatabaseException ex)
+            {
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error retrieving data from the database: {ex}");
+            }
+        }
+
+        [HttpPut]
+        [Route("{id}")]
+        public async Task<ActionResult<CommentResponseDTO>> Update([FromRoute] int id, [FromBody] UpdateCommentDTO modifiedComment)
+        {
+            try
+            {
+                var validator = new UpdateCommentValidator();
+                var validationResult = validator.Validate(modifiedComment);
+
+                if (!validationResult.IsValid)
+                    return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
+
+                var newComment = await _commentRepository.UpdateAsync(id, modifiedComment);
+
+                if (newComment is null)
+                {
+                    return NotFound("Comment not found");
+                }
+
+                return Ok(modifiedComment);
             }
             catch (NotFoundException ex)
             {

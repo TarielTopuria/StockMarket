@@ -1,5 +1,4 @@
 ﻿using api.DTOs.Comment;
-using api.DTOs.Stock;
 using api.Models;
 
 namespace api.Repositories.Interfaces
@@ -10,6 +9,7 @@ namespace api.Repositories.Interfaces
         Task<CommentResponseDTO?> GetCommentByIdAsync(int id);
         Task<Comment?> CreateCommentAsync(int stockId, CommentRequestDTO commentDTO);
         Task<bool> DeleteCommentAsync(int id);
+        Task<CommentResponseDTO?> UpdateAsync(int id, UpdateCommentDTO modifiedComment);
         Task<bool> CommentExists(int id);
     }
 }

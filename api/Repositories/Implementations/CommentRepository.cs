@@ -80,6 +80,30 @@ namespace api.Repositories.Implementations
             }
         }
 
+        public async Task<CommentResponseDTO?> UpdateAsync(int id, UpdateCommentDTO modifiedComment)
+        {
+            try
+            {
+                var existingComment = await _context.Comments.FirstOrDefaultAsync(x => x.Id == id);
+
+                if (existingComment is null)
+                {
+                    return null;
+                }
+
+                existingComment.Title = modifiedComment.Title;
+                existingComment.Content = modifiedComment.Content;
+
+                var result = await _context.SaveChangesAsync();
+
+                return result > 0 ? _mapper.Map<CommentResponseDTO>(existingComment) : null;
+            }
+            catch (DbException ex)
+            {
+                throw new DatabaseException($"Database operation failed: {ex}");
+            }
+        }
+
         public async Task<bool> CommentExists(int id)
         {
             try
