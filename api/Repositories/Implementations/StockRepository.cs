@@ -35,6 +35,15 @@ namespace api.Repositories.Implementations
             {
                 stocks = stocks.Where(s => s.Symbol.Contains(query.Symbol));
             }
+
+            if (!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                if (query.SortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase))
+                {
+                    stocks = query.IsDescending ? stocks.OrderByDescending(s => s.Symbol) : stocks.OrderBy(s => s.Symbol);
+                }
+            }
+
             var stocksList = await stocks.ToListAsync();
             var result = _mapper.Map<List<StockResponseDTO>>(stocksList);
             return result;
