@@ -1,9 +1,13 @@
 using api.Data;
+using api.Models;
 using api.Repositories.Implementations;
 using api.Repositories.Interfaces;
 using api.Validators;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,6 +39,44 @@ builder.Services.AddDbContext<AppDbContext>(op =>
     op.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+
+// Configuring Identity
+builder.Services.AddIdentity<AppUser, IdentityRole>(op =>
+{
+    op.Password.RequireDigit = true;
+    op.Password.RequireLowercase = true;
+    op.Password.RequireUppercase = true;
+    op.Password.RequireNonAlphanumeric = true;
+    op.Password.RequiredLength = 8;
+})
+    .AddEntityFrameworkStores<AppDbContext>();
+
+//Configuring JWT
+builder.Services.AddAuthentication(op =>
+{
+    op.DefaultAuthenticateScheme =
+    op.DefaultChallengeScheme =
+    op.DefaultForbidScheme =
+    op.DefaultScheme =
+    op.DefaultSignInScheme =
+    op.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(op => {
+        op.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["JWT:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["JWT:Audience"],
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey
+            (
+                System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"]
+            ))
+        };
+});
+
+// Registring Services
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 
@@ -60,6 +102,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.UseAuthorization();
 

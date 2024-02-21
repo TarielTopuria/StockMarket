@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Data;
 
@@ -11,9 +12,11 @@ using api.Data;
 namespace api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240221174826_Change Db")]
+    partial class ChangeDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -247,96 +250,6 @@ namespace api.Migrations
                     b.HasIndex("StockId");
 
                     b.ToTable("Comments");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Content = "Leading the tech industry.",
-                            CreationTime = new DateTime(2024, 2, 21, 21, 54, 49, 539, DateTimeKind.Local).AddTicks(6831),
-                            StockId = 1,
-                            Title = "Innovative"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Content = "Consistent growth over the years.",
-                            CreationTime = new DateTime(2024, 2, 21, 21, 54, 49, 539, DateTimeKind.Local).AddTicks(6834),
-                            StockId = 2,
-                            Title = "Solid Performance"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Content = "Dominating the retail space.",
-                            CreationTime = new DateTime(2024, 2, 21, 21, 54, 49, 539, DateTimeKind.Local).AddTicks(6835),
-                            StockId = 3,
-                            Title = "Expansive Reach"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Content = "Continuously innovating.",
-                            CreationTime = new DateTime(2024, 2, 21, 21, 54, 49, 539, DateTimeKind.Local).AddTicks(6837),
-                            StockId = 4,
-                            Title = "Tech Giant"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Content = "Changing how we connect.",
-                            CreationTime = new DateTime(2024, 2, 21, 21, 54, 49, 539, DateTimeKind.Local).AddTicks(6838),
-                            StockId = 5,
-                            Title = "Social Impact"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Content = "Transforming the auto industry.",
-                            CreationTime = new DateTime(2024, 2, 21, 21, 54, 49, 539, DateTimeKind.Local).AddTicks(6840),
-                            StockId = 6,
-                            Title = "Revolutionary"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Content = "A diverse portfolio.",
-                            CreationTime = new DateTime(2024, 2, 21, 21, 54, 49, 539, DateTimeKind.Local).AddTicks(6842),
-                            StockId = 7,
-                            Title = "Stable Investment"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Content = "A key player in global finance.",
-                            CreationTime = new DateTime(2024, 2, 21, 21, 54, 49, 539, DateTimeKind.Local).AddTicks(6843),
-                            StockId = 8,
-                            Title = "Financial Leader"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Content = "Reliable and consistent.",
-                            CreationTime = new DateTime(2024, 2, 21, 21, 54, 49, 539, DateTimeKind.Local).AddTicks(6845),
-                            StockId = 9,
-                            Title = "Trusted Brand"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Content = "A cornerstone of retail.",
-                            CreationTime = new DateTime(2024, 2, 21, 21, 54, 49, 539, DateTimeKind.Local).AddTicks(6846),
-                            StockId = 10,
-                            Title = "Retail Powerhouse"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Content = "Leading in graphics technology.",
-                            CreationTime = new DateTime(2024, 2, 21, 21, 54, 49, 539, DateTimeKind.Local).AddTicks(6848),
-                            StockId = 11,
-                            Title = "Tech Innovator"
-                        });
                 });
 
             modelBuilder.Entity("api.Models.Stock", b =>
@@ -371,118 +284,6 @@ namespace api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Stocks");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CompanyName = "Apple Inc.",
-                            Industry = "Technology",
-                            LastDiv = 0.82m,
-                            MarketCap = 2000000000000L,
-                            Purchase = 150.00m,
-                            Symbol = "AAPL"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CompanyName = "Microsoft Corporation",
-                            Industry = "Technology",
-                            LastDiv = 1.24m,
-                            MarketCap = 1800000000000L,
-                            Purchase = 250.00m,
-                            Symbol = "MSFT"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CompanyName = "Amazon.com, Inc.",
-                            Industry = "Retail",
-                            LastDiv = 0.00m,
-                            MarketCap = 1600000000000L,
-                            Purchase = 3100.00m,
-                            Symbol = "AMZN"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CompanyName = "Alphabet Inc.",
-                            Industry = "Technology",
-                            LastDiv = 0.00m,
-                            MarketCap = 1500000000000L,
-                            Purchase = 2800.00m,
-                            Symbol = "GOOGL"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CompanyName = "Meta Platforms, Inc.",
-                            Industry = "Technology",
-                            LastDiv = 0.00m,
-                            MarketCap = 800000000000L,
-                            Purchase = 325.00m,
-                            Symbol = "FB"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            CompanyName = "Tesla, Inc.",
-                            Industry = "Automotive",
-                            LastDiv = 0.00m,
-                            MarketCap = 600000000000L,
-                            Purchase = 900.00m,
-                            Symbol = "TSLA"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            CompanyName = "Berkshire Hathaway Inc.",
-                            Industry = "Conglomerate",
-                            LastDiv = 0.00m,
-                            MarketCap = 550000000000L,
-                            Purchase = 350000.00m,
-                            Symbol = "BRK.A"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            CompanyName = "Visa Inc.",
-                            Industry = "Financial Services",
-                            LastDiv = 1.28m,
-                            MarketCap = 450000000000L,
-                            Purchase = 220.00m,
-                            Symbol = "V"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            CompanyName = "Johnson & Johnson",
-                            Industry = "Healthcare",
-                            LastDiv = 3.80m,
-                            MarketCap = 400000000000L,
-                            Purchase = 165.00m,
-                            Symbol = "JNJ"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            CompanyName = "Walmart Inc.",
-                            Industry = "Retail",
-                            LastDiv = 2.16m,
-                            MarketCap = 350000000000L,
-                            Purchase = 140.00m,
-                            Symbol = "WMT"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            CompanyName = "NVIDIA Corporation",
-                            Industry = "Technology",
-                            LastDiv = 0.16m,
-                            MarketCap = 300000000000L,
-                            Purchase = 500.00m,
-                            Symbol = "NVDA"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
