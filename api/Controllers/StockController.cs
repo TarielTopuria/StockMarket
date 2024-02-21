@@ -1,4 +1,5 @@
 ﻿using api.DTOs.Stock;
+using api.Helpers;
 using api.Models;
 using api.Repositories.Interfaces;
 using api.Validators.Stock;
@@ -17,11 +18,11 @@ namespace api.Controllers
 
         [HttpGet]
         [Route("GetStocks")]
-        public async Task<ActionResult<List<StockResponseDTO>>> GetAllStock()
+        public async Task<ActionResult<List<StockResponseDTO>>> GetAllStock([FromQuery] QueryObject query)
         {
             try
             {
-                var result = await _stockRepository.GetStocksAsync();
+                var result = await _stockRepository.GetStocksAsync(query);
                 return Ok(result);
             }
             catch (BadHttpRequestException ex)

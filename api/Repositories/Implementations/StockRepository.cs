@@ -1,9 +1,12 @@
 ﻿using api.Data;
 using api.DTOs.Stock;
+using api.Helpers;
 using api.Models;
 using api.Repositories.Interfaces;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Globalization;
 using System.Security.Cryptography.Xml;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -14,16 +17,26 @@ namespace api.Repositories.Implementations
         private readonly AppDbContext _context = context;
         private readonly IMapper _mapper = mapper;
 
-        public async Task<List<StockResponseDTO>?> GetStocksAsync()
+        public async Task<List<StockResponseDTO>?> GetStocksAsync(QueryObject query)
         {
-            var stocks = await _context.Stocks.Include(c => c.Comments).ToListAsync();
+            var stocks = _context.Stocks.Include(c => c.Comments).AsQueryable();
             
             if(stocks is null)
             {
                 return null;
             }
 
-            var result = _mapper.Map<List<StockResponseDTO>>(stocks);
+            if (!string.IsNullOrWhiteSpace(query.CompanyName))
+            {
+                stocks = stocks.Where(s => s.CompanyName.Contains(query.CompanyName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Symbol))
+            {
+                stocks = stocks.Where(s => s.Symbol.Contains(query.Symbol));
+            }
+            var stocksList = await stocks.ToListAsync();
+            var result = _mapper.Map<List<StockResponseDTO>>(stocksList);
             return result;
         }
 
