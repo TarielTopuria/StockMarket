@@ -44,7 +44,9 @@ namespace api.Repositories.Implementations
                 }
             }
 
-            var stocksList = await stocks.ToListAsync();
+            var skipNumber = (query.PageNumber - 1) * query.PageSize;
+
+            var stocksList = await stocks.Skip(skipNumber).Take(query.PageSize).ToListAsync();
             var result = _mapper.Map<List<StockResponseDTO>>(stocksList);
             return result;
         }
