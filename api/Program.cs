@@ -2,6 +2,10 @@ using api.Data;
 using api.Models;
 using api.Repositories.Implementations;
 using api.Repositories.Interfaces;
+using api.Services.Implementations;
+using api.Services.Interfaces;
+using api.UOW.Implementations;
+using api.UOW.Interfaces;
 using api.Validators;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -76,12 +80,22 @@ builder.Services.AddAuthentication(op =>
         };
 });
 
-// Registring Services
+// Registring Repositories
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
-builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 
+// Registring Services
+builder.Services.AddScoped<IStockService, StockService>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+
+// Registring Helper library services
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddValidatorsFromAssemblyContaining<IdValidator>();
+
+// Registring Unit Of Work
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
 var app = builder.Build();
@@ -104,8 +118,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
-
-app.UseAuthorization();
 
 app.UseAuthorization();
 

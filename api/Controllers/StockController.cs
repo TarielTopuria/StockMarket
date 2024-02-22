@@ -1,161 +1,95 @@
 ﻿using api.DTOs.Stock;
 using api.Helpers;
-using api.Models;
-using api.Repositories.Interfaces;
-using api.Validators.Stock;
-using AutoMapper;
+using api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Cryptography.Xml;
 
 namespace api.Controllers
 {
     [Route("api/[Controller]")]
     [ApiController]
-    public class StockController(IStockRepository stockRepository, IMapper mapper) : Controller
+    public class StockController(IStockService stockService) : ControllerBase
     {
-        private readonly IStockRepository _stockRepository = stockRepository;
-        private readonly IMapper _mapper = mapper;
+        private readonly IStockService _stockService = stockService;
 
-        [HttpGet]
-        [Route("GetStocks")]
-        public async Task<ActionResult<List<StockResponseDTO>>> GetAllStock([FromQuery] QueryObject query)
+        [HttpGet("GetStocks")]
+        public async Task<ActionResult<List<StockResponseDTO>>> GetAllStocks([FromQuery] QueryObject query)
         {
             try
             {
-                var result = await _stockRepository.GetStocksAsync(query);
-                return Ok(result);
-            }
-            catch (BadHttpRequestException ex)
-            {
-                return BadRequest(ex.Message);
+                var stocks = await _stockService.GetAllStocksAsync(query);
+                return Ok(stocks);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while processing the request: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
             }
         }
 
-        [HttpGet]
-        [Route("GetStock")]
-        public async Task<ActionResult<List<StockResponseDTO>>> GetStockById([FromQuery] int id)
+        [HttpGet("GetStock/{id}")]
+        public async Task<ActionResult<StockResponseDTO>> GetStockById(int id)
         {
             try
             {
-                var result = await _stockRepository.GetStockByIdAsync(id);
-
-                if (result is null)
+                var stock = await _stockService.GetStockByIdAsync(id);
+                if (stock == null)
                 {
                     return NotFound();
                 }
-
-                return Ok(result);
-            }
-            catch (BadHttpRequestException ex)
-            {
-                return BadRequest(ex.Message);
+                return Ok(stock);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while processing the request: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
             }
         }
 
-        [HttpPost]
-        [Route("CreateStock")]
-        public async Task<ActionResult<StockResponseDTO>> CreateStock([FromBody] StockRequestDTO stock)
+        [HttpPost("CreateStock")]
+        public async Task<ActionResult<StockResponseDTO>> CreateStock([FromBody] StockRequestDTO stockDTO)
         {
             try
             {
-                var validator = new StockRequestValidator();
-                var validationResult = validator.Validate(stock);
-
-                if(!validationResult.IsValid)
-                    return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
-
-                var result = await _stockRepository.CreateStockAsync(stock);
-                
-                if (result == null)
-                {
-                    return BadRequest("Nothing Created");
-                }
-
-                return CreatedAtAction(nameof(GetStockById), new { result.Id }, stock);
-
-            }
-            catch (BadHttpRequestException ex)
-            {
-                return BadRequest(ex.Message);
+                var createdStock = await _stockService.CreateStockAsync(stockDTO);
+                return CreatedAtAction(nameof(GetStockById), new { id = createdStock.Id }, createdStock);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while processing the request: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
             }
         }
 
-        [HttpPut]
-        [Route("UpdateStocks")]
-        public async Task<ActionResult<StockResponseDTO>> UpdateStock([FromQuery] int id, [FromBody] UpdateStockRequestDTO request)
+        [HttpPut("UpdateStock/{id}")]
+        public async Task<ActionResult<StockResponseDTO>> UpdateStock(int id, [FromBody] UpdateStockRequestDTO stockDTO)
         {
             try
             {
-
-                var validator = new UpdateStockValidator();
-                var validationResult = validator.Validate(request);
-
-                if (!validationResult.IsValid)
-                    return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
-
-                var result = await _stockRepository.UpdateStockAsync(id, request);
-
-                if (result is null)
+                var updatedStock = await _stockService.UpdateStockAsync(id, stockDTO);
+                if (updatedStock == null)
                 {
                     return NotFound();
                 }
-
-                if (result.Symbol is null)
-                {
-                    return BadRequest("Nothing to change");
-                }
-
-                return Ok(result);
-            }
-            catch (BadHttpRequestException ex)
-            {
-                return BadRequest(ex.Message);
+                return Ok(updatedStock);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while processing the request: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
             }
         }
 
-        [HttpDelete]
-        [Route("DeleteStock")]
-        public async Task<IActionResult> DeleteStock([FromQuery]int id)
+        [HttpDelete("DeleteStock/{id}")]
+        public async Task<IActionResult> DeleteStock(int id)
         {
             try
             {
-                var result = await _stockRepository.DeleteStock(id);
-
-                if(result is null)
+                var success = await _stockService.DeleteStockAsync(id);
+                if (!success)
                 {
                     return NotFound();
                 }
-
-                if ((bool)!result)
-                {
-                    return BadRequest("Nothing to change");
-                }
-
                 return NoContent();
             }
-            catch (BadHttpRequestException ex)
-            {
-                return BadRequest(ex.Message);
-            }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while processing the request: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
             }
         }
     }

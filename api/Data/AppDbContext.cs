@@ -1,4 +1,5 @@
 ﻿using api.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,6 +43,14 @@ namespace api.Data
                 new Comment { Id = 9, Title = "Trusted Brand", Content = "Reliable and consistent.", CreationTime = DateTime.Now, StockId = 9 },
                 new Comment { Id = 10, Title = "Retail Powerhouse", Content = "A cornerstone of retail.", CreationTime = DateTime.Now, StockId = 10 },
                 new Comment { Id = 11, Title = "Tech Innovator", Content = "Leading in graphics technology.", CreationTime = DateTime.Now, StockId = 11 }
+            );
+
+            // Seed data for user roles
+            modelBuilder.Entity<IdentityRole>().HasData(
+                new IdentityRole { Name = "Admin", NormalizedName = "ADMIN" },
+                new IdentityRole { Name = "Manager", NormalizedName = "MANAGER" },
+                new IdentityRole { Name = "Operator", NormalizedName = "OPERATOR" },
+                new IdentityRole { Name = "Client", NormalizedName = "CLIENT" }
             );
         }
     }

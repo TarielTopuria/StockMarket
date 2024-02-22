@@ -1,23 +1,16 @@
 ﻿using api.Data;
-using api.DTOs.Stock;
 using api.Helpers;
 using api.Models;
 using api.Repositories.Interfaces;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Globalization;
-using System.Security.Cryptography.Xml;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace api.Repositories.Implementations
 {
-    public class StockRepository(AppDbContext context, IMapper mapper) : IStockRepository
+    public class StockRepository(AppDbContext context) : Repository<Stock>(context), IStockRepository
     {
         private readonly AppDbContext _context = context;
-        private readonly IMapper _mapper = mapper;
 
-        public async Task<List<StockResponseDTO>?> GetStocksAsync(QueryObject query)
+        public async Task<List<Stock>?> GetStocksAsync(QueryObject query)
         {
             var stocks = _context.Stocks.Include(c => c.Comments).AsQueryable();
             
@@ -47,75 +40,40 @@ namespace api.Repositories.Implementations
             var skipNumber = (query.PageNumber - 1) * query.PageSize;
 
             var stocksList = await stocks.Skip(skipNumber).Take(query.PageSize).ToListAsync();
-            var result = _mapper.Map<List<StockResponseDTO>>(stocksList);
-            return result;
+            return stocksList;
         }
 
-        public async Task<StockResponseDTO?> GetStockByIdAsync(int id)
+        public async Task<Stock?> GetStockByIdAsync(int id)
         {
-            var stock = await _context.Stocks.Include(c => c.Comments).Where(x => x.Id == id).FirstOrDefaultAsync();
-            
-            if(stock is null)
+            var stocks = await _context.Stocks.Include(c => c.Comments).Where(x => x.Id == id).FirstOrDefaultAsync();
+            if (stocks is null)
             {
                 return null;
             }
-
-            var result = _mapper.Map<StockResponseDTO>(stock);
-
-            return result;
+            return stocks;
         }
 
-        public async Task<StockResponseDTO?> CreateStockAsync(StockRequestDTO stock)
+        public async Task<Stock> CreateStockAsync(Stock stock)
         {
-            var stockToCreate = _mapper.Map<Stock>(stock);
-            
-            await _context.Stocks.AddAsync(stockToCreate);
-
-            var result = await _context.SaveChangesAsync();
-
-            return result > 0 ? _mapper.Map<StockResponseDTO>(stockToCreate) : null;
+            await _context.Stocks.AddAsync(stock);
+            return stock;
         }
 
-        public async Task<StockResponseDTO?> UpdateStockAsync(int id, UpdateStockRequestDTO request)
+        public void UpdateStock(Stock stock)
         {
-            var stock = await _context.Stocks.Where(x => x.Id == id).FirstOrDefaultAsync();
-            
-            if(stock is null)
+            _context.Stocks.Update(stock);
+        }
+
+        public async Task<bool> DeleteStockAsync(int id)
+        {
+            var stock = await _context.Stocks.FindAsync(id);
+            if (stock == null)
             {
-                return null;
-            }
-
-            stock.Symbol = request.Symbol;
-            stock.CompanyName = request.CompanyName;
-            stock.Purchase = request.Purchase;
-            stock.LastDiv = request.LastDiv;
-            stock.Industry = request.Industry;
-            stock.MarketCap = request.MarketCap;
-
-            var changes = await _context.SaveChangesAsync();
-
-            return changes > 0 ? _mapper.Map<StockResponseDTO>(stock) : new StockResponseDTO { };
-        }
-
-        public async Task<bool?> DeleteStock(int id)
-        {
-            var stock = await _context.Stocks.Where(x => x.Id == id).FirstOrDefaultAsync();
-
-            if (stock is null)
-            {
-                return null;
+                return false;
             }
 
             _context.Stocks.Remove(stock);
-
-            var changes = await _context.SaveChangesAsync();
-
-            return changes > 0;
-        }
-
-        public async Task<bool> StockExists(int id)
-        {
-            return await _context.Stocks.AnyAsync(x => x.Id == id);
+            return true;
         }
     }
 }

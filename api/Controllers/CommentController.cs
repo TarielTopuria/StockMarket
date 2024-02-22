@@ -84,11 +84,6 @@ namespace api.Controllers
                 if (!validationResult.IsValid)
                     return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
 
-                if (!await _stockRepository.StockExists(stockId))
-                {
-                    return NotFound("Stock not found");
-                }
-
                 var newComment = await _commentRepository.CreateCommentAsync(stockId, comment);
 
                 if (newComment is null)

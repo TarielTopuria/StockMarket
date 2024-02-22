@@ -4,13 +4,13 @@ using api.Models;
 
 namespace api.Repositories.Interfaces
 {
-    public interface IStockRepository
+    public interface IStockRepository : IRepository<Stock>
     {
-        Task<List<StockResponseDTO>?> GetStocksAsync(QueryObject query);
-        Task<StockResponseDTO?> GetStockByIdAsync(int id);
-        Task<StockResponseDTO?> CreateStockAsync(StockRequestDTO stock);
-        Task<StockResponseDTO?> UpdateStockAsync(int id, UpdateStockRequestDTO request);
-        Task<bool?> DeleteStock(int id);
-        Task<bool> StockExists(int id);
+        Task<List<Stock>?> GetStocksAsync(QueryObject query);
+        Task<Stock?> GetStockByIdAsync(int id);
+        Task<Stock> CreateStockAsync(Stock stock);
+        void UpdateStock(Stock stock);
+        Task<bool> DeleteStockAsync(int id);
     }
+
 }
